@@ -239,6 +239,22 @@ char digit_to_char(int digit, int *error)
 	return digit - (0 - '0');
 }
 
+char *to_str(double num)
+{
+	size_t i = 0;
+
+	//        4   0   8         0     00       00       00       00       00        00
+	//  0    100 00001000     0000 00000000 00000000 0000000 000000000 00000000 00000000
+	//  ^    ------------     ----------------------------------------------------------
+	// sign  exponent = 2^9   mantissa with implicit high bit = 1 (normal)
+
+	{
+		// int x = ((unsigned char *)&num)[i];
+		printf("%c ", 5 - (0 - '0'));
+	}
+	return "";
+}
+
 int char_is_upper(const char c)
 {
 	return c >= 'A' && c <= 'Z';
@@ -296,6 +312,29 @@ char *to_lower(const char *string)
 
 	temp[l] = '\0';
 	return temp;
+}
+
+int int_to_str(int value, unsigned char *out, size_t l)
+{
+	int base = 10;
+	int sum = value < 0 ? ~value + 1 : value;
+	int i = l - 1;
+	if (l < 1)
+		return 0;
+
+	do
+	{
+		int digit = sum % base;
+		out[i--] = '0' + digit;
+		sum /= base;
+	} while (sum);
+
+	if (value < 0)
+	{
+		out[0] = '-';
+	}
+	out[l] = '\0';
+	return 1;
 }
 
 int main(int argc, char **args)
@@ -360,7 +399,25 @@ int main(int argc, char **args)
 
 	int error;
 	assert(digit_to_char(8, &error) == '8');
-	assert(to_int("2439", &error) == 2439);
+
+	unsigned char *fooo = malloc(4);
+	int_to_str(-423, fooo, 4);
+	assert(comp((const char *)fooo, "-423"));
+
+	unsigned char *fooo2 = malloc(3);
+	int_to_str(523, fooo2, 3);
+	assert(comp((const char *)fooo2, "523"));
+
+	// assert(to_int("2439", &error) == 2439);
+	to_str(24.550000);
+	// assert(to_str(to_double("24.55", &error)) == to_str(24.550000));
+
+	// uint32_t n = 1191223;
+	// do
+	// {
+	// 	uint32_t digit = n % 10;
+	// 	// do something with digit
+	// } while (n /= 10);
 
 	return 0;
 }
